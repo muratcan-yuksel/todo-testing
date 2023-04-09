@@ -1,65 +1,50 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import React, { useState, useEffect } from "react";
 
-import styles from '@/pages/index.module.css'
+const index = () => {
+  const [todos, setTodos] = useState<string[]>([]); // specify type as string[]
+  const [inputValue, setInputValue] = useState<string>("");
 
-export default function Home() {
+  useEffect(() => {
+    const storedTodos = localStorage.getItem("todos");
+    if (storedTodos) {
+      setTodos(JSON.parse(storedTodos));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(todos));
+    // localStorage.clear();
+  }, [todos]);
+
+  const addTodo = () => {
+    if (inputValue.trim() === "") return; // prevent adding empty todo
+    setTodos([...todos, inputValue]);
+    setInputValue("");
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+  };
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a href="https://vercel.com/new" className={styles.card}>
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+    <div className="flex flex-col justify-start items-center h-screen">
+      <h1 className="font-bold">Todo App</h1>
+      <input
+        className="border border-b-8"
+        placeholder="Your todo here"
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+      />
+      <button onClick={addTodo} className="border border-blue-300 p-2">
+        Add Todo
+      </button>
+      <ul className="flex flex-col justify-start items-start">
+        {todos.map((todo, index) => (
+          <li key={index}>{todo}</li>
+        ))}
+      </ul>
     </div>
-  )
-}
+  );
+};
+
+export default index;
